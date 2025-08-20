@@ -1,0 +1,227 @@
+openapi: 3.0.0
+info:
+  title: VisioHome API
+  description: API backend para gestionar usuarios, autenticación e imágenes.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor local
+
+paths:
+  /usuarios:
+    get:
+      summary: Obtener todos los usuarios
+      tags:
+        - Usuarios
+      security:
+        bearerAuth: [] # 👈 Aquí le decimos que usa JWT
+      responses:
+        "200":
+          description: Lista de usuarios
+    post:
+      summary: Crear un nuevo usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Usuario"
+      responses:
+        "201":
+          description: Usuario creado
+
+  /usuarios/{id}:
+    get:
+      summary: Obtener un usuario por ID
+      tags:
+        - Usuarios
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID del usuario
+      responses:
+        "200":
+          description: Usuario encontrado
+    put:
+      summary: Actualizar un usuario
+      tags:
+        - Usuarios
+      security:
+          bearerAuth: []  
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Usuario"
+      responses:
+        "200":
+          description: Usuario actualizado
+    delete:
+      summary: Eliminar un usuario
+      tags:
+        - Usuarios
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: Usuario eliminado
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      tags:
+        - Autenticación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        "200":
+          description: Login exitoso
+
+  /auth/registro:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Autenticación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Usuario"
+      responses:
+        "201":
+          description: Usuario registrado
+
+  /imagenes:
+    post:
+      summary: Subir una imagen
+      tags:
+        - Imágenes
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Imagen subida
+    get:
+      summary: Listar imágenes
+      tags:
+        - Imágenes
+      responses:
+        "200":
+          description: Lista de imágenes
+
+components:
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        nombre:
+          type: string
+        correo:
+          type: string
+        password:
+          type: string
+        rol:
+          type: string
+    Login:
+      type: object
+      properties:
+        correo:
+          type: string
+        password:
+          type: string
+/auth/login:
+  post:
+    summary: Iniciar sesión
+    tags:
+      - Autenticación
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Login"
+          example:
+            correo: "aquiles@mail.com"
+            password: "123456"
+    responses:
+      "200":
+        description: Login exitoso
+        content:
+          application/json:
+            example:
+              accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              usuario:
+                id: 1
+                nombre: "Aquiles"
+                correo: "aquiles@mail.com"
+                rol: "admin"
+      "400":
+        description: Datos inválidos
+      "401":
+        description: Credenciales incorrectas
+      "500":
+        description: Error en el servidor
+
+/auth/registro:
+  post:
+    summary: Registrar un nuevo usuario
+    tags:
+      - Autenticación
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Usuario"
+          example:
+            nombre: "Maria"
+            correo: "maria@mail.com"
+            password: "maria123"
+            rol: "user"
+    responses:
+      "201":
+        description: Usuario registrado exitosamente
+        content:
+          application/json:
+            example:
+              id: 2
+              nombre: "Maria"
+              correo: "maria@mail.com"
+              rol: "user"
+      "400":
+        description: Datos inválidos
+      "409":
+        description: El correo ya está registrado
+      "500":
+        description: Error en el servidor
