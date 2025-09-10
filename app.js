@@ -13,7 +13,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.json());
 app.use("/api", router);
-
 app.listen(3000, () => {
   console.log("Servidor escuchando en el puerto 3000");
 });
