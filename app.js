@@ -1,6 +1,5 @@
 const express = require("express");
 const router = require("./routers/router");
-const cors = require("cors");
 const path = require("path");
 const swaggerUI = require("swagger-ui-express");
 const YAML = require("yamljs");
